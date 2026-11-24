@@ -2,5 +2,5 @@
   "functions": {
     "api/index.py": { "includeFiles": "music_composer/**" }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "rewrites": [{ "source": "/((?!_vercel/).*)", "destination": "/api/index" }]
 }

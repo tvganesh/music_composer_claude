@@ -40,6 +40,9 @@ The same app can run on Vercel. `api/index.py` reuses the local server's request
 
 Every push to `main` then redeploys automatically.
 
+**Analytics:** in the project on Vercel, open **Analytics** and click **Enable**. The page
+already loads Vercel's analytics script, but only on the deployed site, not when it runs locally.
+
 ### Levels
 
 | Level | Chords you get | Example (C major / A minor) |
