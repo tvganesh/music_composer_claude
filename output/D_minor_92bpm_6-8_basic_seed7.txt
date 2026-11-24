@@ -1,0 +1,21 @@
+Key: D minor | Tempo: 92 BPM | Time: 6/8 | Level: basic | Seed: 7
+Form: Intro (4 bars) -> Verse 1 (8 bars) -> Chorus (8 bars) -> Verse 2 (8 bars) -> Ending (4 bars)
+
+[Intro]  bars 1-4
+| Dm (i)  | C (VII) | Bb (VI) | A (V)   |
+
+[Verse 1]  bars 5-12
+| Dm (i)  | Gm (iv) | C (VII) | F (III) |
+| Dm (i)  | Gm (iv) | C (VII) | F (III) |
+
+[Chorus]  bars 13-20
+| Bb (VI) | Gm (iv) | Dm (i)  | A (V)   |
+| Bb (VI) | Gm (iv) | Dm (i)  | A (V)   |
+
+[Verse 2]  bars 21-28
+| Dm (i)  | Gm (iv) | C (VII) | F (III) |
+| Dm (i)  | Bb (VI) | C (VII) | F (III) |
+
+[Ending]  bars 29-32
+| Bb (VI) | Gm (iv) | A (V)   | Dm (i)  |
+

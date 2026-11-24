@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Composer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="17" cy="16" r="3" fill="currentColor"/></svg>
+      <h1>Music Composer</h1>
+    </div>
+    <div class="song-meta" id="songMeta" aria-live="polite"></div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel controls" aria-label="Song settings">
+      <div class="field">
+        <label for="key">Key</label>
+        <select id="key"></select>
+      </div>
+      <div class="field">
+        <span class="label">Scale</span>
+        <div class="seg" id="scale" role="group" aria-label="Scale"></div>
+      </div>
+      <div class="field">
+        <label for="tempo">Tempo <output id="tempoOut" for="tempo"></output></label>
+        <input type="range" id="tempo">
+      </div>
+      <div class="field">
+        <span class="label">Time signature</span>
+        <div class="seg wrap" id="time" role="group" aria-label="Time signature"></div>
+      </div>
+      <div class="field">
+        <span class="label">Level</span>
+        <div class="seg" id="level" role="group" aria-label="Level"></div>
+        <p class="hint" id="levelHint"></p>
+      </div>
+      <div class="field">
+        <span class="label">Chord style</span>
+        <div class="seg" id="style" role="group" aria-label="Chord style"></div>
+        <p class="hint" id="styleHint"></p>
+      </div>
+      <div class="field">
+        <span class="label">Song form</span>
+        <div class="chips" id="form" role="group" aria-label="Sections"></div>
+      </div>
+      <div class="field">
+        <label for="seed">Seed</label>
+        <div class="seed-row">
+          <input id="seed" type="number" min="0" inputmode="numeric">
+          <button id="newSong" class="btn" type="button">New song</button>
+        </div>
+        <p class="hint">The same seed and settings always give the same song. Change the key, scale or meter to hear the same idea in a new setting.</p>
+      </div>
+    </aside>
+
+    <section class="stage" id="stage">
+      <div class="panel transport">
+        <button id="rewind" class="btn icon" type="button" aria-label="Back to start" title="Back to start (Home)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 5l-10 7 10 7z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="play" class="btn primary play" type="button" title="Play / pause (Space)">
+          <svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>
+          <span id="playLabel">Play</span>
+        </button>
+        <button id="stop" class="btn icon" type="button" aria-label="Stop" title="Stop (Esc). Press again to go back to bar 1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"/></svg>
+        </button>
+        <div class="pos" id="pos">Bar 1</div>
+        <div class="toggles">
+          <label class="toggle melody"><input type="checkbox" id="trackMelody" checked><span class="dot"></span>Melody</label>
+          <label class="toggle chords"><input type="checkbox" id="trackChords" checked><span class="dot"></span>Chords</label>
+          <label class="toggle"><input type="checkbox" id="loop"><span class="loop-icon" aria-hidden="true">⟲</span>Loop section</label>
+        </div>
+        <span class="spacer"></span>
+        <button id="download" class="btn accent" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download MIDI
+        </button>
+      </div>
+
+      <div class="panel roll-wrap">
+        <canvas id="roll" aria-label="Piano roll of the melody and chords. Click to move the playhead."></canvas>
+      </div>
+
+      <div id="error" class="error" role="alert" hidden></div>
+
+      <div class="panel sheet">
+        <div class="sheet-head">
+          <h2>Chord sheet</h2>
+          <span class="hint">Click a bar to play from there</span>
+        </div>
+        <div id="sheet" class="sheet-sections"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+Key: C major | Tempo: 96 BPM | Time: 4/4 | Level: intermediate | Seed: 2
+Form: Intro (4 bars) -> Verse 1 (8 bars) -> Chorus (8 bars) -> Verse 2 (8 bars) -> Ending (4 bars)
+
+[Intro]  bars 1-4
+| Cmaj7 (Imaj7)   | Fmaj7 (IVmaj7)  | Cmaj7 (Imaj7)   | G7sus4 (V7sus4) |
+
+[Verse 1]  bars 5-12
+| Cmaj7 (Imaj7) | Am7 (vi7)     | Dm7 (ii7)     | G7 (V7)       |
+| Cmaj7 (Imaj7) | Am7 (vi7)     | Dm7 (ii7)     | G7 (V7)       |
+
+[Chorus]  bars 13-20
+| Fmaj7 (IVmaj7) | G7 (V7)        | Em7 (iii7)     | Am7 (vi7)      |
+| Fmaj7 (IVmaj7) | G7 (V7)        | Em7 (iii7)     | Am7 (vi7)      |
+
+[Verse 2]  bars 21-28
+| Cmaj7 (Imaj7) | Am7 (vi7)     | Dm7 (ii7)     | G7 (V7)       |
+| Cmaj7 (Imaj7) | Am7 (vi7)     | Dm7b5 (iiø7)  | G7 (V7)       |
+
+[Ending]  bars 29-32
+| Fmaj7 (IVmaj7) | Fm (iv)        | Cmaj7 (Imaj7)  |    -           |
+

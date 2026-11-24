@@ -1,0 +1,236 @@
+{
+  "key": "C",
+  "scale": "major",
+  "tempo": 100,
+  "time_signature": "3/4",
+  "level": "basic",
+  "seed": 42,
+  "sections": [
+    {
+      "kind": "intro",
+      "label": "Intro",
+      "start_bar": 1,
+      "bars": 4.0,
+      "chords": [
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 1.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 2.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 3.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 4.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "verse",
+      "label": "Verse 1",
+      "start_bar": 5,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 5.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "vi",
+          "symbol": "Am",
+          "start_bar": 6.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 7.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 8.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 9.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "vi",
+          "symbol": "Am",
+          "start_bar": 10.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 11.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 12.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "chorus",
+      "label": "Chorus",
+      "start_bar": 13,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "vi",
+          "symbol": "Am",
+          "start_bar": 13.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 14.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 15.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 16.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "vi",
+          "symbol": "Am",
+          "start_bar": 17.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 18.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 19.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 20.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "verse2",
+      "label": "Verse 2",
+      "start_bar": 21,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 21.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "vi",
+          "symbol": "Am",
+          "start_bar": 22.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 23.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 24.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 25.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "iii",
+          "symbol": "Em",
+          "start_bar": 26.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 27.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 28.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "ending",
+      "label": "Ending",
+      "start_bar": 29,
+      "bars": 4.0,
+      "chords": [
+        {
+          "roman": "IV",
+          "symbol": "F",
+          "start_bar": 29.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V",
+          "symbol": "G",
+          "start_bar": 30.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "C",
+          "start_bar": 31.0,
+          "bars": 2.0
+        }
+      ]
+    }
+  ]
+}

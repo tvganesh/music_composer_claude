@@ -1,0 +1,292 @@
+{
+  "key": "A",
+  "scale": "minor",
+  "tempo": 88,
+  "time_signature": "4/4",
+  "level": "advanced",
+  "seed": 4,
+  "sections": [
+    {
+      "kind": "intro",
+      "label": "Intro",
+      "start_bar": 1,
+      "bars": 4.0,
+      "chords": [
+        {
+          "roman": "i9",
+          "symbol": "Am9",
+          "start_bar": 1.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VImaj7",
+          "symbol": "Fmaj7",
+          "start_bar": 2.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IIImaj7",
+          "symbol": "Cmaj7",
+          "start_bar": 3.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VII7",
+          "symbol": "G7",
+          "start_bar": 4.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "verse",
+      "label": "Verse 1",
+      "start_bar": 5,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "i7",
+          "symbol": "Am7",
+          "start_bar": 5.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "iv7",
+          "symbol": "Dm7",
+          "start_bar": 6.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "bII",
+          "symbol": "Bb",
+          "start_bar": 7.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 8.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i7",
+          "symbol": "Am7",
+          "start_bar": 9.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "iv7",
+          "symbol": "Dm7",
+          "start_bar": 10.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "bII",
+          "symbol": "Bb",
+          "start_bar": 11.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 12.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "chorus",
+      "label": "Chorus",
+      "start_bar": 13,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "VImaj7",
+          "symbol": "Fmaj7",
+          "start_bar": 13.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VII7",
+          "symbol": "G7",
+          "start_bar": 14.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i9",
+          "symbol": "Am9",
+          "start_bar": 15.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 16.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VImaj7",
+          "symbol": "Fmaj7",
+          "start_bar": 17.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VII7",
+          "symbol": "G7",
+          "start_bar": 18.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i9",
+          "symbol": "Am9",
+          "start_bar": 19.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 20.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "verse2",
+      "label": "Verse 2",
+      "start_bar": 21,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "i7",
+          "symbol": "Am7",
+          "start_bar": 21.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "iv7",
+          "symbol": "Dm7",
+          "start_bar": 22.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "bII",
+          "symbol": "Bb",
+          "start_bar": 23.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 24.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i7",
+          "symbol": "Am7",
+          "start_bar": 25.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "IV7",
+          "symbol": "D7",
+          "start_bar": 26.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "bII",
+          "symbol": "Bb",
+          "start_bar": 27.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 28.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "chorus2",
+      "label": "Chorus 2",
+      "start_bar": 29,
+      "bars": 8.0,
+      "chords": [
+        {
+          "roman": "VImaj7",
+          "symbol": "Fmaj7",
+          "start_bar": 29.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VII7",
+          "symbol": "G7",
+          "start_bar": 30.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i9",
+          "symbol": "Am9",
+          "start_bar": 31.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 32.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VImaj7",
+          "symbol": "Fmaj7",
+          "start_bar": 33.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "VII7",
+          "symbol": "G7",
+          "start_bar": 34.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "i9",
+          "symbol": "Am9",
+          "start_bar": 35.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 36.0,
+          "bars": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "ending",
+      "label": "Ending",
+      "start_bar": 37,
+      "bars": 4.0,
+      "chords": [
+        {
+          "roman": "ii\u00f87",
+          "symbol": "Bm7b5",
+          "start_bar": 37.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "V7",
+          "symbol": "E7",
+          "start_bar": 38.0,
+          "bars": 1.0
+        },
+        {
+          "roman": "I",
+          "symbol": "A",
+          "start_bar": 39.0,
+          "bars": 2.0
+        }
+      ]
+    }
+  ]
+}

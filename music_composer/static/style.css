@@ -1,0 +1,293 @@
+:root {
+  --bg: #f3f4f7;
+  --panel: #ffffff;
+  --panel-2: #eef0f4;
+  --line: #dfe3ea;
+  --text: #1a1e26;
+  --muted: #5f6878;
+  --primary: #4a5fd4;
+  --primary-text: #ffffff;
+  --accent: #1f8a5b;
+  --accent-text: #ffffff;
+  --melody: #d97b12;
+  --chords: #2a8c9a;
+  --playhead: #e0483e;
+  --sec-intro: #7b8aa8;
+  --sec-verse: #3f9d6b;
+  --sec-chorus: #d4577d;
+  --sec-ending: #8a63c9;
+  --error-bg: #fdecec;
+  --error-text: #9b1c1c;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 2px 6px rgba(16, 24, 40, .06);
+  --radius: 14px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d0f14;
+    --panel: #151820;
+    --panel-2: #1d212b;
+    --line: #2a2f3b;
+    --text: #e8eaf0;
+    --muted: #9aa3b4;
+    --primary: #8196ff;
+    --primary-text: #0d0f14;
+    --accent: #3fbf86;
+    --accent-text: #0d0f14;
+    --melody: #f5a83c;
+    --chords: #4cc3d1;
+    --playhead: #ff6b61;
+    --sec-intro: #8f9cba;
+    --sec-verse: #5cc08b;
+    --sec-chorus: #ee7aa0;
+    --sec-ending: #a988e6;
+    --error-bg: #3a1618;
+    --error-text: #ffb4b0;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; letter-spacing: -.01em; }
+
+/* ---------- header ---------- */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-size: 18px; font-weight: 700; }
+.logo { width: 26px; height: 26px; color: var(--primary); }
+.song-meta { color: var(--muted); font-variant-numeric: tabular-nums; }
+.song-meta strong { color: var(--text); font-weight: 600; }
+
+/* ---------- layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px 24px 32px;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+@media (max-width: 920px) {
+  .layout { grid-template-columns: minmax(0, 1fr); padding: 12px 16px 24px; }
+  .top { padding: 12px 16px; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- controls ---------- */
+.controls {
+  min-width: 0;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-self: start;
+  position: sticky;
+  top: 16px;
+}
+@media (max-width: 920px) { .controls { position: static; } }
+
+.field label, .field .label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.field output { color: var(--text); font-size: 13px; text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+select, input[type="number"] {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 8px 10px;
+}
+select:focus-visible, input:focus-visible, button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+input[type="range"] { width: 100%; accent-color: var(--primary); }
+
+.seg {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--panel-2);
+  border-radius: 10px;
+}
+.seg.wrap { flex-wrap: wrap; }
+.seg.wrap button { flex: 1 0 28%; }
+.seg button {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.seg button:hover:not(:disabled) { background: color-mix(in srgb, var(--panel) 60%, transparent); }
+.seg button[aria-pressed="true"] {
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  font-weight: 650;
+}
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 5px 11px;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: var(--chip-color, var(--primary));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+
+.seed-row { display: flex; gap: 8px; }
+.seed-row input { flex: 1; min-width: 0; font-variant-numeric: tabular-nums; }
+
+.hint { margin: 7px 0 0; color: var(--muted); font-size: 12.5px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover { filter: brightness(1.04); }
+.btn svg { width: 16px; height: 16px; }
+.btn.primary { background: var(--primary); color: var(--primary-text); border-color: transparent; }
+.btn.accent { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+.btn.icon { padding: 8px 10px; }
+.btn.play { min-width: 104px; justify-content: center; }
+
+/* ---------- stage ---------- */
+.stage { display: flex; flex-direction: column; gap: 16px; min-width: 0; transition: opacity .15s; }
+.stage.busy { opacity: .7; }
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  flex-wrap: wrap;
+}
+.pos {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  min-width: 150px;
+}
+.pos strong { color: var(--text); }
+.toggles { display: flex; gap: 14px; flex-wrap: wrap; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 500; }
+.toggle input { accent-color: var(--primary); margin: 0; }
+.toggle .dot { width: 10px; height: 10px; border-radius: 3px; }
+.toggle.melody .dot { background: var(--melody); }
+.toggle.chords .dot { background: var(--chords); }
+.loop-icon { color: var(--muted); }
+.spacer { flex: 1; }
+
+.roll-wrap { overflow: hidden; }
+#roll { display: block; width: 100%; height: 400px; cursor: pointer; }
+@media (max-width: 600px) { #roll { height: 300px; } }
+
+.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+/* ---------- chord sheet ---------- */
+.sheet { padding: 18px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sheet-head h2 { font-size: 16px; }
+.sheet-head .hint { margin: 0; }
+.sheet-sections { display: grid; gap: 14px; }
+
+.sec-card { border-left: 3px solid var(--sec); padding-left: 12px; }
+.sec-card h3 { font-size: 14px; display: flex; gap: 10px; align-items: baseline; margin-bottom: 8px; }
+.sec-card h3 span { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+
+.bars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 600px) { .bars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.bar {
+  position: relative;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 8px 10px 7px;
+  min-height: 54px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.bar:hover { border-color: var(--line); }
+.bar.now { border-color: var(--playhead); box-shadow: inset 0 0 0 1px var(--playhead); }
+.bar .num { position: absolute; top: 5px; right: 8px; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chord { display: flex; flex-direction: column; min-width: 0; }
+.chord .sym { font-weight: 700; font-size: 16px; line-height: 1.2; }
+.chord .rn { color: var(--muted); font-size: 12px; }
+.bar .held { color: var(--muted); font-size: 16px; }
+#level button, #style button { flex: 1 1 auto; padding-inline: 8px; }  /* size to the label so "Intermediate" and "Chords only" fit */

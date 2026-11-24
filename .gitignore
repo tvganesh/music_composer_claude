@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+# Logic Pro projects and screen recordings stay local (large, personal)
+output/*.logicx/
+output/video/

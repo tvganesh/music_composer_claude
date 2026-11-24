@@ -1,0 +1,25 @@
+Key: A minor | Tempo: 88 BPM | Time: 4/4 | Level: advanced | Seed: 4
+Form: Intro (4 bars) -> Verse 1 (8 bars) -> Chorus (8 bars) -> Verse 2 (8 bars) -> Chorus 2 (8 bars) -> Ending (4 bars)
+
+[Intro]  bars 1-4
+| Am9 (i9)        | Fmaj7 (VImaj7)  | Cmaj7 (IIImaj7) | G7 (VII7)       |
+
+[Verse 1]  bars 5-12
+| Am7 (i7)  | Dm7 (iv7) | Bb (bII)  | E7 (V7)   |
+| Am7 (i7)  | Dm7 (iv7) | Bb (bII)  | E7 (V7)   |
+
+[Chorus]  bars 13-20
+| Fmaj7 (VImaj7) | G7 (VII7)      | Am9 (i9)       | E7 (V7)        |
+| Fmaj7 (VImaj7) | G7 (VII7)      | Am9 (i9)       | E7 (V7)        |
+
+[Verse 2]  bars 21-28
+| Am7 (i7)  | Dm7 (iv7) | Bb (bII)  | E7 (V7)   |
+| Am7 (i7)  | D7 (IV7)  | Bb (bII)  | E7 (V7)   |
+
+[Chorus 2]  bars 29-36
+| Fmaj7 (VImaj7) | G7 (VII7)      | Am9 (i9)       | E7 (V7)        |
+| Fmaj7 (VImaj7) | G7 (VII7)      | Am9 (i9)       | E7 (V7)        |
+
+[Ending]  bars 37-40
+| Bm7b5 (iiø7) | E7 (V7)      | A (I)        |    -         |
+

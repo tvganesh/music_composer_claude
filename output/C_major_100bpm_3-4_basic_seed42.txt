@@ -1,0 +1,21 @@
+Key: C major | Tempo: 100 BPM | Time: 3/4 | Level: basic | Seed: 42
+Form: Intro (4 bars) -> Verse 1 (8 bars) -> Chorus (8 bars) -> Verse 2 (8 bars) -> Ending (4 bars)
+
+[Intro]  bars 1-4
+| C (I)  | F (IV) | C (I)  | G (V)  |
+
+[Verse 1]  bars 5-12
+| C (I)   | Am (vi) | F (IV)  | G (V)   |
+| C (I)   | Am (vi) | F (IV)  | G (V)   |
+
+[Chorus]  bars 13-20
+| Am (vi) | F (IV)  | C (I)   | G (V)   |
+| Am (vi) | F (IV)  | C (I)   | G (V)   |
+
+[Verse 2]  bars 21-28
+| C (I)    | Am (vi)  | F (IV)   | G (V)    |
+| C (I)    | Em (iii) | F (IV)   | G (V)    |
+
+[Ending]  bars 29-32
+| F (IV) | G (V)  | C (I)  |    -   |
+

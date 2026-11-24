@@ -1,0 +1,21 @@
+Key: A minor | Tempo: 84 BPM | Time: 3/4 | Level: basic | Seed: 5
+Form: Intro (4 bars) -> Verse 1 (8 bars) -> Chorus (8 bars) -> Verse 2 (8 bars) -> Ending (4 bars)
+
+[Intro]  bars 1-4
+| Am (i)  | G (VII) | F (VI)  | E (V)   |
+
+[Verse 1]  bars 5-12
+| Am (i)  | G (VII) | F (VI)  | E (V)   |
+| Am (i)  | G (VII) | F (VI)  | E (V)   |
+
+[Chorus]  bars 13-20
+| F (VI)  | G (VII) | Am (i)  | E (V)   |
+| F (VI)  | G (VII) | Am (i)  | E (V)   |
+
+[Verse 2]  bars 21-28
+| Am (i)  | G (VII) | F (VI)  | E (V)   |
+| Am (i)  | Em (v)  | F (VI)  | E (V)   |
+
+[Ending]  bars 29-32
+| F (VI)  | G (VII) | Am (i)  |    -    |
+
