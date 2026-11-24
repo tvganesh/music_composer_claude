@@ -114,7 +114,7 @@ def song_payload(song) -> dict:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "MusicComposer/1.0"
+    server_version = "MelodicChordalSequencer/1.0"
 
     def log_message(self, fmt, *args):  # keep the terminal quiet
         pass
@@ -172,7 +172,7 @@ def serve(port: int = 8765, open_browser: bool = True):
     if server is None:
         raise SystemExit(f"No free port between {port} and {port + 19}")
     url = f"http://127.0.0.1:{server.server_address[1]}/"
-    print(f"Music Composer is running at {url}  (press Ctrl+C to stop)")
+    print(f"Melodic Chordal Sequencer is running at {url}  (press Ctrl+C to stop)")
     if open_browser:
         webbrowser.open(url)
     try:
@@ -184,7 +184,7 @@ def serve(port: int = 8765, open_browser: bool = True):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="python3 -m music_composer.ui", description="Music Composer web UI")
+    p = argparse.ArgumentParser(prog="python3 -m music_composer.ui", description="Melodic Chordal Sequencer web UI")
     p.add_argument("--port", type=int, default=8765)
     p.add_argument("--no-browser", action="store_true", help="don't open a browser window")
     args = p.parse_args(argv)

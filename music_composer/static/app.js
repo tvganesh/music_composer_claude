@@ -1,6 +1,6 @@
 "use strict";
 
-/* Music Composer UI: settings -> /api/compose -> piano roll, chord sheet and
+/* Melodic Chordal Sequencer UI: settings -> /api/compose -> piano roll, chord sheet and
    in-browser preview playback (Web Audio). Download MIDI -> /api/midi. */
 
 const $ = (id) => document.getElementById(id);

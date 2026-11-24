@@ -1,4 +1,4 @@
-# Music Composer
+# Melodic Chordal Sequencer
 
 Generates a **chord sequence and a melody** for a whole song and writes them as a MIDI file
 for Logic Pro. You choose the key, scale, tempo, time signature and level. The song form is
