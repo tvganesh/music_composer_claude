@@ -30,6 +30,16 @@ This opens the composer in your browser at http://127.0.0.1:8765. Press **Ctrl+C
 
 The browser preview uses a simple built-in synth. It's for judging the notes; the real sound comes from Logic.
 
+### Online (Vercel)
+
+The same app can run on Vercel. `api/index.py` reuses the local server's request handler, and
+`vercel.json` sends every request to it.
+
+1. On [vercel.com](https://vercel.com), choose **Add New › Project** and import this GitHub repository.
+2. Leave the framework preset as **Other**, with no build command, and click **Deploy**.
+
+Every push to `main` then redeploys automatically.
+
 ### Levels
 
 | Level | Chords you get | Example (C major / A minor) |
