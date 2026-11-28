@@ -16,6 +16,10 @@ const STYLE_HINTS = {
   "arpeggio": "One fixed eighth-note pattern written into the MIDI. For Logic's own arpeggio styles, use Chords only instead.",
 };
 const EPS = 1e-6;
+const TRACKS = ["Melody", "Chords", "Bass", "Drums"];
+const REVERB_SEND = { Melody: 1, Chords: 1, Bass: 0.15, Drums: 0.35 };
+// General MIDI drum notes -> lane in the piano roll's drum strip (0 = bottom)
+const DRUM_LANE = { 36: 0, 41: 0, 45: 1, 47: 1, 50: 1, 37: 1, 38: 1, 39: 1, 42: 2, 44: 2, 46: 2, 49: 2, 51: 2, 53: 2 };
 
 let OPTS = null;
 let params = null;
@@ -37,13 +41,20 @@ function saveSettings() {
 }
 
 /* Settings can come in the link, e.g. /?key=D&scale=minor&tempo=92&time=6/8&seed=7
-   (also level, style, form=intro,verse,chorus). They override the saved settings. */
+   (also level, style, mood, bass=1, drums=1, form=intro,verse,chorus). They override the saved settings. */
 function linkParams() {
   const q = new URLSearchParams(location.search);
   const out = {};
-  for (const [name, field] of [["key", "key"], ["scale", "scale"], ["time", "time"], ["level", "level"], ["style", "chord_style"]]) {
+  for (const [name, field] of [["key", "key"], ["scale", "scale"], ["time", "time"], ["level", "level"], ["style", "chord_style"], ["mood", "mood"]]) {
     if (q.has(name)) out[field] = q.get(name);
   }
+  for (const name of ["bass", "drums"]) {
+    if (q.has(name)) out[name] = ["", "1", "true", "yes", "on"].includes(q.get(name).toLowerCase());
+  }
+  // A mood in the link brings its suggested scale and tempo unless the link sets them too.
+  const mood = out.mood && (OPTS.moods || []).find((m) => m.id === out.mood);
+  if (mood && mood.scale && !q.has("scale")) out.scale = mood.scale;
+  if (mood && mood.tempo && !q.has("tempo")) out.tempo = mood.tempo;
   for (const name of ["tempo", "seed"]) {
     if (q.has(name)) out[name] = parseInt(q.get(name), 10);
   }
@@ -60,7 +71,9 @@ function initialParams(stored) {
   const styles = OPTS.chord_styles.map((s) => s.id);
   const sections = OPTS.sections.map((s) => s.id);
   const form = Array.isArray(stored.form) ? stored.form.filter((k) => sections.includes(k)) : [];
+  const moods = (OPTS.moods || []).map((m) => m.id);
   return {
+    mood: ok(stored.mood, moods) ? stored.mood : "none",
     key: ok(stored.key, OPTS.keys) ? stored.key : "C",
     scale: ok(stored.scale, OPTS.scales) ? stored.scale : "major",
     tempo: Number.isInteger(stored.tempo) ? clamp(stored.tempo, OPTS.tempo.min, OPTS.tempo.max) : OPTS.tempo.default,
@@ -69,6 +82,8 @@ function initialParams(stored) {
     chord_style: ok(stored.chord_style, styles) ? stored.chord_style : (OPTS.default_chord_style || styles[0]),
     form: form.length ? form : OPTS.default_form.slice(),
     seed: Number.isInteger(stored.seed) ? stored.seed : null,
+    bass: stored.bass === true,
+    drums: stored.drums === true,
     v: 2,
   };
 }
@@ -100,6 +115,9 @@ async function compose() {
     if (seq !== composeSeq) return;
     song = data;
     params.seed = data.seed;
+    for (const name of ["Bass", "Drums"]) {
+      $(`track${name}`).closest("label").hidden = !song.tracks.some((t) => t.name === name);
+    }
     $("seed").value = data.seed;
     saveSettings();
     hideError();
@@ -140,6 +158,7 @@ function segmented(el, items, current, onPick) {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = it.label;
+    b.dataset.id = it.id;
     b.setAttribute("aria-pressed", String(it.id === current));
     if (it.disabled) { b.disabled = true; b.title = it.title || ""; }
     b.addEventListener("click", () => {
@@ -150,7 +169,28 @@ function segmented(el, items, current, onPick) {
   }
 }
 
+function setPressed(el, id) {
+  for (const b of el.children) b.setAttribute("aria-pressed", String(b.dataset.id === id));
+}
+
+function setTempo(bpm) {
+  params.tempo = bpm;
+  $("tempo").value = bpm;
+  $("tempoOut").textContent = `${bpm} BPM`;
+}
+
 function buildControls() {
+  segmented($("mood"), OPTS.moods, params.mood, (v) => {
+    params.mood = v;
+    // A mood suggests a scale and tempo; change them afterwards if you like.
+    const m = OPTS.moods.find((x) => x.id === v);
+    if (m && m.scale) { params.scale = m.scale; setPressed($("scale"), m.scale); }
+    if (m && m.tempo) setTempo(m.tempo);
+    showMoodHint();
+    compose();
+  });
+  showMoodHint();
+
   const keySel = $("key");
   keySel.innerHTML = OPTS.keys.map((k) => `<option value="${k}">${k.replace("b", "♭").replace("#", "♯")}</option>`).join("");
   keySel.value = params.key;
@@ -184,6 +224,7 @@ function buildControls() {
   $("styleHint").textContent = STYLE_HINTS[params.chord_style];
 
   buildFormChips();
+  buildGuideChips();
 
   const seed = $("seed");
   seed.addEventListener("change", () => {
@@ -192,6 +233,30 @@ function buildControls() {
     compose();
   });
   $("newSong").addEventListener("click", () => { params.seed = null; compose(); });
+}
+
+function showMoodHint() {
+  const m = OPTS.moods.find((x) => x.id === params.mood);
+  $("moodHint").textContent = m ? m.hint : "";
+}
+
+function buildGuideChips() {
+  const el = $("guides");
+  el.innerHTML = "";
+  for (const g of OPTS.guide_tracks) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = g.label;
+    b.style.setProperty("--chip-color", `var(--${g.id})`);
+    b.setAttribute("aria-pressed", String(params[g.id]));
+    b.addEventListener("click", () => {
+      params[g.id] = !params[g.id];
+      b.setAttribute("aria-pressed", String(params[g.id]));
+      compose();
+    });
+    el.appendChild(b);
+  }
 }
 
 function showLevelHint() {
@@ -226,6 +291,7 @@ function renderMeta() {
   if (!song) return;
   $("songMeta").innerHTML =
     `<strong>${song.key}</strong> · ${song.time} · ${params.tempo} BPM · ` +
+    (song.mood && song.mood !== "none" ? `${song.mood} · ` : "") +
     `${song.sections.length} sections · seed <strong>${song.seed}</strong>`;
 }
 
@@ -242,7 +308,8 @@ function makeImpulse(ctx, seconds) {
 }
 
 function trackOn(name) {
-  return name === "Melody" ? $("trackMelody").checked : $("trackChords").checked;
+  const el = $(`track${name}`);
+  return el ? el.checked : true;
 }
 
 class Player {
@@ -270,12 +337,18 @@ class Player {
     wet.gain.value = 0.22;
     reverb.connect(wet).connect(this.master);
     this.bus = {};
-    for (const name of ["Melody", "Chords"]) {
+    for (const name of TRACKS) {
       const g = ctx.createGain();
       g.connect(this.master);
-      g.connect(reverb);
+      const send = ctx.createGain();
+      send.gain.value = REVERB_SEND[name];
+      g.connect(send).connect(reverb);
       this.bus[name] = g;
     }
+    const len = Math.floor(ctx.sampleRate * 1.5);
+    this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = this.noise.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     this.applyTracks();
   }
 
@@ -403,6 +476,7 @@ class Player {
   }
 
   voice(n, t, dur) {
+    if (n.track === "Drums") return this.drum(n.pitch, t, Math.pow(n.vel / 127, 1.4));
     const ctx = this.ctx;
     dur = Math.max(dur, 0.04);
     const f = 440 * Math.pow(2, (n.pitch - 69) / 12);
@@ -431,6 +505,16 @@ class Player {
       env.setTargetAtTime(peak * 0.65, t + 0.012, 0.18);
       env.setTargetAtTime(0, t + dur, 0.07);
       stopAt = t + dur + 0.5;
+    } else if (n.track === "Bass") {
+      filt.frequency.value = 500 + 700 * v;
+      filt.Q.value = 2;
+      osc("sawtooth", f, 0.55);
+      osc("sine", f, 1);
+      const peak = 0.34 * v;
+      env.linearRampToValueAtTime(peak, t + 0.008);
+      env.setTargetAtTime(peak * 0.55, t + 0.008, 0.22);
+      env.setTargetAtTime(0, t + dur, 0.05);
+      stopAt = t + dur + 0.4;
     } else {
       filt.frequency.value = 1500 + 1500 * v;
       osc("sine", f, 1);
@@ -445,6 +529,59 @@ class Player {
     const rec = { out, oscs };
     for (const o of oscs) { o.start(t); o.stop(stopAt); }
     oscs[0].onended = () => { out.disconnect(); this.voices.delete(rec); };
+    this.voices.add(rec);
+  }
+
+  /* A small synthesized kit for the General MIDI drum notes the Drums track uses. */
+  drum(note, t, v) {
+    const ctx = this.ctx;
+    const out = ctx.createGain();
+    out.connect(this.bus.Drums);
+    const srcs = [];
+    let end = t;
+    const shape = (g, peak, decay) => {
+      peak = Math.max(peak, 0.0005);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(peak, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.002 + decay);
+      end = Math.max(end, t + decay + 0.05);
+    };
+    const noise = (type, freq, q, peak, decay) => {
+      const src = ctx.createBufferSource();
+      src.buffer = this.noise;
+      const f = ctx.createBiquadFilter();
+      f.type = type; f.frequency.value = freq; f.Q.value = q;
+      const g = ctx.createGain();
+      shape(g, peak, decay);
+      src.connect(f).connect(g).connect(out);
+      srcs.push(src);
+    };
+    const tone = (f0, f1, peak, decay, type = "sine") => {
+      const o = ctx.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(f0, t);
+      o.frequency.exponentialRampToValueAtTime(f1, t + decay);
+      const g = ctx.createGain();
+      shape(g, peak, decay);
+      o.connect(g).connect(out);
+      srcs.push(o);
+    };
+    const TOMS = { 41: 72, 45: 96, 47: 120, 50: 150 };
+    if (note === 36) tone(140, 42, 0.95 * v, 0.32);
+    else if (note === 38) { tone(210, 150, 0.32 * v, 0.1, "triangle"); noise("highpass", 1400, 0.7, 0.5 * v, 0.17); }
+    else if (note === 37) { noise("bandpass", 2600, 3, 0.55 * v, 0.045); tone(900, 700, 0.12 * v, 0.03, "square"); }
+    else if (note === 39) noise("bandpass", 1300, 1.4, 0.6 * v, 0.14);
+    else if (note === 42) noise("highpass", 7500, 0.7, 0.22 * v, 0.045);
+    else if (note === 44) noise("highpass", 6500, 0.7, 0.16 * v, 0.06);
+    else if (note === 46) noise("highpass", 7000, 0.7, 0.22 * v, 0.32);
+    else if (note === 49) noise("highpass", 4500, 0.5, 0.3 * v, 1.5);
+    else if (note === 51) { noise("bandpass", 7000, 1.2, 0.16 * v, 0.5); tone(3200, 3150, 0.03 * v, 0.4, "triangle"); }
+    else if (note === 53) tone(1250, 1240, 0.13 * v, 0.8, "triangle");
+    else if (TOMS[note]) tone(TOMS[note] * 1.5, TOMS[note], 0.7 * v, 0.38);
+    else { out.disconnect(); return; }
+    for (const s of srcs) { s.start(t); s.stop(end); }
+    const rec = { out, oscs: srcs };
+    srcs[0].onended = () => { out.disconnect(); this.voices.delete(rec); };
     this.voices.add(rec);
   }
 
@@ -520,10 +657,13 @@ function drawRollStatic() {
   g.clearRect(0, 0, W, H);
   if (!song) return;
 
-  const padL = 38, padR = 10, secH = 26, chordH = 24, top = secH + chordH + 6, bottom = H - 10;
+  const drums = song.tracks.find((t) => t.name === "Drums");
+  const laneH = drums ? 24 : 0;
+  const padL = 38, padR = 10, secH = 26, chordH = 24, top = secH + chordH + 6;
+  const bottom = H - 10 - (drums ? laneH + 6 : 0);
   const total = song.total_quarters, bq = song.bar_quarters;
   const x = (b) => padL + (b / total) * (W - padL - padR);
-  const all = song.tracks.flatMap((t) => t.notes.map((n) => n[2]));
+  const all = song.tracks.filter((t) => t.name !== "Drums").flatMap((t) => t.notes.map((n) => n[2]));
   const minP = Math.min(...all) - 2, maxP = Math.max(...all) + 2;
   const rowH = (bottom - top) / (maxP - minP + 1);
   const y = (p) => top + (maxP - p) * rowH;
@@ -597,7 +737,24 @@ function drawRollStatic() {
     g.globalAlpha = 1;
   };
   drawTrack("Chords", cssVar("--chords"), 0.55, 2);
+  drawTrack("Bass", cssVar("--bass"), 0.8, 2);
   drawTrack("Melody", cssVar("--melody"), 1, 3);
+
+  // drum strip: kick and floor tom at the bottom, snare and toms in the middle, cymbals on top
+  if (drums) {
+    const y0 = H - 10 - laneH, row = laneH / 3;
+    g.fillStyle = muted;
+    g.font = `11px ${font}`;
+    g.fillText("Dr", 8, y0 + laneH / 2 + 4);
+    g.fillStyle = cssVar("--drums");
+    g.globalAlpha = trackOn("Drums") ? 0.9 : 0.25;
+    for (const [s, , p, v] of drums.notes) {
+      const lane = DRUM_LANE[p] ?? 1;
+      const h = Math.max(2, row - 2) * (0.5 + 0.5 * v / 127);
+      g.fillRect(x(s), y0 + (2 - lane) * row + (row - h) / 2, 2, h);
+    }
+    g.globalAlpha = 1;
+  }
 
   roll.geo = { padL, padR, W, H, total, x, secH };
   drawPlayhead();
@@ -714,7 +871,7 @@ function wireTransport() {
   $("rewind").addEventListener("click", () => player.seek(0));
   $("stop").addEventListener("click", () => player.stop());
   $("download").addEventListener("click", downloadMidi);
-  for (const id of ["trackMelody", "trackChords"]) {
+  for (const id of TRACKS.map((name) => `track${name}`)) {
     $(id).addEventListener("change", () => { player.applyTracks(); drawRollStatic(); });
   }
   $("loop").addEventListener("change", () => { if (player.playing) player.play(player.now()); });

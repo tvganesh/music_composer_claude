@@ -7,22 +7,30 @@ import math
 EPS = 1e-6
 
 
+def _mood_label(song) -> str:
+    return "" if song.mood == "none" else song.mood
+
+
 def song_title(song) -> str:
-    return f"{song.key.name}, {song.tempo} BPM, {song.timesig.label}, {song.level}"
+    mood = f", {_mood_label(song)}" if _mood_label(song) else ""
+    return f"{song.key.name}, {song.tempo} BPM, {song.timesig.label}, {song.level}{mood}"
 
 
 def file_stem(song) -> str:
     ts = song.timesig
+    mood = f"_{_mood_label(song)}" if _mood_label(song) else ""
+    extras = "".join(f"_{name.lower()}" for name in ("Bass", "Drums") if song.has_track(name))
     return (f"{song.key.tonic.replace('#', 's')}_{song.key.mode}_{song.tempo}bpm_"
-            f"{ts.num}-{ts.den}_{song.level}_seed{song.seed}"
-            + ("" if song.chord_style == "chords" else f"_{song.chord_style}"))
+            f"{ts.num}-{ts.den}_{song.level}{mood}_seed{song.seed}"
+            + ("" if song.chord_style == "chords" else f"_{song.chord_style}") + extras)
 
 
 def chord_sheet(song) -> str:
     bar_q = song.timesig.bar_quarters
     lines = [
         f"Key: {song.key.name} | Tempo: {song.tempo} BPM | Time: {song.timesig.label} | "
-        f"Level: {song.level} | Seed: {song.seed}",
+        f"Level: {song.level}" + (f" | Mood: {_mood_label(song)}" if _mood_label(song) else "")
+        + f" | Seed: {song.seed}",
         "Form: " + " -> ".join(f"{s.label} ({s.bars:g} bars)" for s in song.sections),
         "",
     ]
@@ -47,7 +55,8 @@ def song_json(song) -> str:
     bar_q = song.timesig.bar_quarters
     data = {
         "key": song.key.tonic, "scale": song.key.mode, "tempo": song.tempo,
-        "time_signature": song.timesig.label, "level": song.level, "seed": song.seed,
+        "time_signature": song.timesig.label, "level": song.level, "mood": song.mood, "seed": song.seed,
+        "tracks": [t.name for t in song.tracks],
         "sections": [
             {
                 "kind": sec.kind, "label": sec.label,

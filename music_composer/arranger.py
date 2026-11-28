@@ -1,9 +1,14 @@
 """Song form: picks progressions for each section, lays them out in time and
-renders two parts:
+renders the parts:
 
-  Chords  one voiced chord per change (block, arpeggio or block without the
-          left-hand root - see _chords_part)
   Melody  motif-based phrases for every section (see melody.py)
+  Chords  one voiced chord per change (held chords, with bass, or arpeggio;
+          see _chords_part)
+  Bass    optional guide track (see groove.py)
+  Drums   optional guide track, General MIDI drum map on channel 10
+
+A mood (moods.py) swaps in its own progressions, melody style and groove;
+mood "none" is the original behaviour.
 
 Times are in quarter notes from the start of the song.
 """
@@ -12,7 +17,9 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 
+from .groove import bass_part, drum_part
 from .melody import generate_melody
+from .moods import MOODS, NONE, check_mood, mood_progressions, mood_substitutions
 from .progressions import (MODAL_LEVELS, MODAL_SUBSTITUTIONS, PROGRESSIONS, SUBSTITUTIONS, fill_bars,
                            parse_progression, substitute)
 from .rhythm import TimeSig, arpeggio_pattern
@@ -73,6 +80,7 @@ class Song:
     sections: list
     tracks: list
     chord_style: str = DEFAULT_CHORD_STYLE
+    mood: str = NONE
 
     @property
     def total_quarters(self) -> float:
@@ -81,6 +89,9 @@ class Song:
 
     def track(self, name: str) -> Track:
         return next(t for t in self.tracks if t.name == name)
+
+    def has_track(self, name: str) -> bool:
+        return any(t.name == name for t in self.tracks)
 
 
 def _section_plan(kind: str, progs: dict, subs: dict, rng: random.Random, modal: dict = None,
@@ -102,8 +113,10 @@ def _section_plan(kind: str, progs: dict, subs: dict, rng: random.Random, modal:
 
 
 def compose(key: Key, tempo: int, timesig: TimeSig, level: str = "basic", seed: int = None,
-            form=DEFAULT_FORM, chord_style: str = DEFAULT_CHORD_STYLE) -> Song:
+            form=DEFAULT_FORM, chord_style: str = DEFAULT_CHORD_STYLE, mood: str = NONE,
+            bass: bool = False, drums: bool = False) -> Song:
     chord_style = STYLE_ALIASES.get(chord_style, chord_style)
+    mood = check_mood(mood)
     if level not in PROGRESSIONS:
         raise ValueError(f"Level {level!r} is not available yet; choose from {', '.join(PROGRESSIONS)}")
     if chord_style not in CHORD_STYLES:
@@ -117,11 +130,15 @@ def compose(key: Key, tempo: int, timesig: TimeSig, level: str = "basic", seed: 
         seed = random.randrange(1_000_000)
     rng = random.Random(seed)
 
-    lib = PROGRESSIONS[level][key.mode]
+    mood_lib = mood_progressions(mood, level, key.mode)
+    lib = mood_lib or PROGRESSIONS[level][key.mode]
     progs = {k: parse_progression(rng.choice(lib[k])) for k in ("intro", "verse", "chorus", "ending")}
-    subs = SUBSTITUTIONS[level][key.mode]
-    # Modal interchange uses its own random stream, so adding it didn't change any song's melody.
-    modal = MODAL_SUBSTITUTIONS[key.mode] if level in MODAL_LEVELS else None
+    if mood_lib:
+        subs, modal = mood_substitutions(mood, key.mode), None  # the mood's own Verse 2 changes
+    else:
+        subs = SUBSTITUTIONS[level][key.mode]
+        # Modal interchange uses its own random stream, so adding it didn't change any song's melody.
+        modal = MODAL_SUBSTITUTIONS[key.mode] if level in MODAL_LEVELS else None
     modal_rng = random.Random(f"modal-{seed}")
 
     bar_q = timesig.bar_quarters
@@ -134,15 +151,23 @@ def compose(key: Key, tempo: int, timesig: TimeSig, level: str = "basic", seed: 
             t += bars * bar_q
         sections.append(section)
 
-    # Separate random streams, so changing the chord style never changes the melody.
+    # Separate random streams, so changing the chord style never changes the melody, and
+    # adding the guide tracks never changes the melody or the chords.
     melody_rng, chords_rng = random.Random(rng.randrange(2**32)), random.Random(rng.randrange(2**32))
-    melody = [Note(*n) for n in generate_melody(sections, key, timesig, melody_rng)]
-    chords = _chords_part(sections, timesig, chord_style, chords_rng)
+    m = MOODS[mood]
+    melody = [Note(*n) for n in generate_melody(sections, key, timesig, melody_rng, m["melody"])]
+    chords = _chords_part(sections, timesig, chord_style, chords_rng, m["chord_velocity"])
     tracks = [Track("Melody", 0, 0, melody), Track("Chords", 1, 0, chords)]
-    return Song(key, tempo, timesig, level, seed, sections, tracks, chord_style)
+    if bass:
+        notes = bass_part(sections, key, timesig, m["bass"], random.Random(f"bass-{seed}"), m["chord_velocity"])
+        tracks.append(Track("Bass", 2, 33, [Note(*n) for n in notes]))  # GM 34: Electric Bass (finger)
+    if drums:
+        notes = drum_part(sections, timesig, m["drums"], random.Random(f"drums-{seed}"))
+        tracks.append(Track("Drums", 9, 0, [Note(*n) for n in notes]))  # channel 10: GM drums
+    return Song(key, tempo, timesig, level, seed, sections, tracks, chord_style, mood)
 
 
-def _chords_part(sections: list, ts: TimeSig, style: str, rng: random.Random) -> list:
+def _chords_part(sections: list, ts: TimeSig, style: str, rng: random.Random, velocity_shift: int = 0) -> list:
     """chords    held root-position chords only, steady velocity: the layout Logic's
                  Arpeggiator and chord detection handle best (default)
        block     root in the left hand + a voice-led right-hand chord
@@ -157,7 +182,7 @@ def _chords_part(sections: list, ts: TimeSig, style: str, rng: random.Random) ->
     for i, (sec, slot) in enumerate(all_slots):
         last = i == len(all_slots) - 1
         dur = slot.length if last else slot.length * 0.98  # tiny gap so repeated notes re-strike
-        base = CHORD_VELOCITY[sec.kind]
+        base = CHORD_VELOCITY[sec.kind] + velocity_shift
         end = slot.start + slot.length
 
         if style == "chords":

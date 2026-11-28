@@ -11,6 +11,8 @@
   --accent-text: #ffffff;
   --melody: #d97b12;
   --chords: #2a8c9a;
+  --bass: #a04cc0;
+  --drums: #6b7280;
   --playhead: #e0483e;
   --sec-intro: #7b8aa8;
   --sec-verse: #3f9d6b;
@@ -37,6 +39,8 @@
     --accent-text: #0d0f14;
     --melody: #f5a83c;
     --chords: #4cc3d1;
+    --bass: #cf8ae6;
+    --drums: #a3abba;
     --playhead: #ff6b61;
     --sec-intro: #8f9cba;
     --sec-verse: #5cc08b;
@@ -240,6 +244,9 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .toggle .dot { width: 10px; height: 10px; border-radius: 3px; }
 .toggle.melody .dot { background: var(--melody); }
 .toggle.chords .dot { background: var(--chords); }
+.toggle.bass .dot { background: var(--bass); }
+.toggle.drums .dot { background: var(--drums); }
+.toggle[hidden] { display: none; }
 .loop-icon { color: var(--muted); }
 .spacer { flex: 1; }
 
@@ -290,4 +297,4 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .chord .sym { font-weight: 700; font-size: 16px; line-height: 1.2; }
 .chord .rn { color: var(--muted); font-size: 12px; }
 .bar .held { color: var(--muted); font-size: 16px; }
-#level button, #style button { flex: 1 1 auto; padding-inline: 8px; }  /* size to the label so "Intermediate" and "Chords only" fit */
+#level button, #style button, #mood button { flex: 1 1 auto; padding-inline: 8px; }  /* size to the label so "Intermediate" and "Chords only" fit */

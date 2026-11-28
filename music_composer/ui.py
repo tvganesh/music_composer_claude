@@ -3,7 +3,8 @@
     python3 -m music_composer.ui            # opens http://127.0.0.1:8765 in your browser
     python3 -m music_composer.ui --port 9000 --no-browser
 
-The page talks to two JSON endpoints:
+The page talks to three JSON endpoints:
+    GET  /api/options  the choices shown in the settings panel
     POST /api/compose  settings -> song (sections, chords, notes, chord sheet)
     POST /api/midi     settings -> the .mid file
 The server only listens on 127.0.0.1, so it isn't reachable from other machines.
@@ -19,6 +20,7 @@ from pathlib import Path
 
 from .arranger import CHORD_STYLES, DEFAULT_CHORD_STYLE, DEFAULT_FORM, LABELS, SECTION_KINDS, STYLE_ALIASES, compose
 from .midi_export import song_to_midi
+from .moods import MOOD_IDS, MOODS, check_mood
 from .progressions import LEVEL_INFO, LEVELS
 from .rhythm import TimeSig
 from .sheet import chord_sheet, file_stem, song_title
@@ -45,6 +47,9 @@ OPTIONS = {
     "default_chord_style": DEFAULT_CHORD_STYLE,
     "sections": [{"id": k, "label": LABELS[k]} for k in SECTION_KINDS],
     "default_form": list(DEFAULT_FORM),
+    "moods": [{"id": k, "label": MOODS[k]["label"], "hint": MOODS[k]["hint"],
+               "scale": MOODS[k]["scale"], "tempo": MOODS[k]["tempo"]} for k in MOOD_IDS],
+    "guide_tracks": [{"id": "bass", "label": "Bass"}, {"id": "drums", "label": "Drums"}],
     "tempo": {"min": 40, "max": 220, "default": 100},
 }
 
@@ -81,7 +86,14 @@ def build_song(params: dict):
     style = STYLE_ALIASES.get(style, style)
     if style not in CHORD_STYLES:
         raise ValueError(f"Unknown chord style {style!r}")
-    return compose(key, tempo, ts, level, seed, tuple(str(k) for k in form), style)
+    mood = check_mood(params.get("mood"))
+    extras = {}
+    for name in ("bass", "drums"):
+        value = params.get(name, False)
+        if not isinstance(value, bool):
+            raise ValueError(f"{name.capitalize()} must be true or false")
+        extras[name] = value
+    return compose(key, tempo, ts, level, seed, tuple(str(k) for k in form), style, mood, **extras)
 
 
 def song_payload(song) -> dict:
@@ -97,6 +109,7 @@ def song_payload(song) -> dict:
         "total_quarters": song.total_quarters,
         "level": song.level,
         "chord_style": song.chord_style,
+        "mood": song.mood,
         "filename": file_stem(song) + ".mid",
         "sections": [
             {"kind": sec.kind, "label": sec.label, "start": sec.start, "bars": sec.bars,

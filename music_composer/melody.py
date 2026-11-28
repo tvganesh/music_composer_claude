@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import bisect
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .rhythm import TimeSig, rhythm_cells
 from .theory import Chord, Key
@@ -41,6 +41,23 @@ PLANS = {
     "chorus2": [("H", None), ("H", "half"), ("C", None), ("H", "full")],
     "ending":  [("H", None), ("END", "final")],
 }
+
+
+@dataclass(frozen=True)
+class MelodyStyle:
+    """How the melody is shaped; moods.py supplies one per mood. The defaults are
+    the original melody, drawn from the random stream in the original order."""
+    density: dict = field(default_factory=lambda: {"A": "medium", "B": ("sparse", "busy"), "H": "busy",
+                                                   "C": "medium"})  # B: picked at random from the tuple
+    shapes: dict = field(default_factory=lambda: {"A": "arch", "B": "rise", "H": "arch", "C": "fall"})
+    step_weights: tuple = (0.12, 0.5, 0.24, 0.1, 0.04)  # contour move sizes 0..4 scale steps
+    register_shift: int = 0     # semitones added to every section's register centre
+    velocity_shift: int = 0
+    gate: float = 0.95          # sounding fraction of each note (the last note always rings)
+    hook_repeat: float = 0.6    # chance the hook repeats its first bar
+
+
+DEFAULT_STYLE = MelodyStyle()
 
 
 @dataclass
@@ -100,23 +117,24 @@ def _cadence_pitch(prev: int, kind: str, chord: Chord, key: Key, lo: int, hi: in
 
 # ------------------------------------------------------------------ motifs
 
-def _contour(rng: random.Random, shape: str, n: int = 24) -> list:
+def _contour(rng: random.Random, shape: str, n: int = 24, weights=DEFAULT_STYLE.step_weights) -> list:
     moves = []
     for i in range(n):
         if moves and abs(moves[-1]) >= 2 and rng.random() < 0.75:
             moves.append(-1 if moves[-1] > 0 else 1)  # gap fill: step back after a leap
             continue
-        size = rng.choices([0, 1, 2, 3, 4], [0.12, 0.5, 0.24, 0.1, 0.04])[0]
+        size = rng.choices([0, 1, 2, 3, 4], weights)[0]
         frac = i / (n - 1)
         p_up = {"arch": 0.72 if frac < 0.35 else 0.32, "rise": 0.68, "fall": 0.32}[shape]
         moves.append(size if rng.random() < p_up else -size)
     return moves
 
 
-def _make_motif(cells: dict, density: str, shape: str, rng: random.Random, repeat_bar: float = 0.0) -> Motif:
+def _make_motif(cells: dict, density: str, shape: str, rng: random.Random, repeat_bar: float = 0.0,
+                weights=DEFAULT_STYLE.step_weights) -> Motif:
     first = rng.choice(cells[density])
     second = first if rng.random() < repeat_bar else rng.choice(cells[density])
-    return Motif([first, second], rng.choice(cells["cadence"]), _contour(rng, shape))
+    return Motif([first, second], rng.choice(cells["cadence"]), _contour(rng, shape, weights=weights))
 
 
 def _ornament(motif: Motif, rng: random.Random) -> Motif:
@@ -205,20 +223,22 @@ def _plan(kind: str, n: int) -> list:
     return plan
 
 
-def generate_melody(sections: list, key: Key, ts: TimeSig, rng: random.Random) -> list:
+def generate_melody(sections: list, key: Key, ts: TimeSig, rng: random.Random,
+                    style: MelodyStyle = DEFAULT_STYLE) -> list:
     """Returns (start, duration, pitch, velocity) tuples for the whole song."""
     cells = rhythm_cells(ts)
     bar_q = ts.bar_quarters
+    dens, shape, w = style.density, style.shapes, style.step_weights
 
-    hook = _make_motif(cells, "busy", "arch", rng, repeat_bar=0.6)
+    hook = _make_motif(cells, dens["H"], shape["H"], rng, repeat_bar=style.hook_repeat, weights=w)
     motifs = {
-        "A": _make_motif(cells, "medium", "arch", rng),
-        "B": _make_motif(cells, rng.choice(["sparse", "busy"]), "rise", rng),
+        "A": _make_motif(cells, dens["A"], shape["A"], rng, weights=w),
+        "B": _make_motif(cells, rng.choice(dens["B"]), shape["B"], rng, weights=w),
         "H": hook,
-        "C": _make_motif(cells, "medium", "fall", rng),
+        "C": _make_motif(cells, dens["C"], shape["C"], rng, weights=w),
         "I": Motif([rng.choice(cells["sparse"]), rng.choice(cells["sparse"])],
                    rng.choice(cells["cadence"]), hook.contour),
-        "END": Motif([rng.choice(cells["medium"])], [(0.0, bar_q, False)], _contour(rng, "fall")),
+        "END": Motif([rng.choice(cells["medium"])], [(0.0, bar_q, False)], _contour(rng, "fall", weights=w)),
     }
     verse2_motifs = {"A": _ornament(motifs["A"], rng), "B": _ornament(motifs["B"], rng)}
 
@@ -236,12 +256,12 @@ def generate_melody(sections: list, key: Key, ts: TimeSig, rng: random.Random) -
         t = sec.start
         for (label, cadence), unit_bars in zip(_plan(sec.kind, len(units)), units):
             motif = verse2_motifs.get(label, motifs[label]) if sec.kind == "verse2" else motifs[label]
-            center = ref + REGISTER[sec.kind] + UNIT_LIFT[label]
+            center = ref + REGISTER[sec.kind] + UNIT_LIFT[label] + style.register_shift
             events = _unit_events(motif, unit_bars, bar_q, cadence)
             for start, dur, pitch, strong in _realize(events, t, chord_at, key, ts, lo, hi,
                                                       center, motif.contour, cadence, rng):
-                vel = VELOCITY[sec.kind] + (6 if strong else 0) + rng.randint(-4, 4)
-                out.append([start, dur * 0.95, pitch, max(1, min(127, vel))])
+                vel = VELOCITY[sec.kind] + (6 if strong else 0) + rng.randint(-4, 4) + style.velocity_shift
+                out.append([start, dur * style.gate, pitch, max(1, min(127, vel))])
             t += unit_bars * bar_q
 
     if out:  # let the final note ring to the end of the song
